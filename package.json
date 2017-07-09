@@ -1,0 +1,33 @@
+{
+  "name": "alis-web-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RESTful API for serving data from ALIS WEB",
+  "keywords": [
+    "backend",
+    "alis-web"
+  ],
+  "author": "vviital",
+  "license": "MIT",
+  "main": "app.js",
+  "dependencies": {
+    "hapi": "^10.0.0",
+    "swagger-hapi": "^0.1.0"
+  },
+  "devDependencies": {
+    "should": "^7.1.0",
+    "supertest": "^1.0.0"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "test": "swagger project test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/grodno-city/alis-web-backend.git"
+  },
+  "bugs": {
+    "url": "https://github.com/grodno-city/alis-web-backend/issues"
+  },
+  "homepage": "https://github.com/grodno-city/alis-web-backend#readme"
+}
