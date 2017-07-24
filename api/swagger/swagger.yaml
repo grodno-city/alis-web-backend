@@ -17,42 +17,197 @@ consumes:
 # format of the responses to the client (Accepts)
 produces:
   - application/json
+        
+# defenition of parameters
+parameters:
+  limit:
+    name: limit
+    in: query
+    type: integer
+    format: int32
+    maximum: 100
+    minimum: 5
+    default: 10
+    required: false
+    description: number of items to fetch
+  offset:
+    name: offset
+    in: query
+    type: integer
+    format: int32
+    maximum: 100
+    minimum: 5
+    default: 10
+    required: false
+    description: number of items which should be skipped
+  
 paths:
-  /hello:
-    # binds a127 app logic to a route
-    x-swagger-router-controller: hello_world
+  /books:
+    x-swagger-router-controller: book_controller
     get:
-      description: Returns 'Hello' to the caller
-      # used as the method name of the controller
-      operationId: hello
+      description: Returns lists of books
+      operationId: getBooks
       parameters:
-        - name: name
-          in: query
-          description: The name of the person to whom to say hello
-          required: false
-          type: string
+        - $ref: "#/parameters/limit"
+        - $ref: "#/parameters/offset"
       responses:
         "200":
           description: Success
           schema:
-            # a pointer to a definition
-            $ref: "#/definitions/HelloWorldResponse"
-        # responses may fall through to errors
+            $ref: "#/definitions/BookList"
         default:
           description: Error
           schema:
-            $ref: "#/definitions/ErrorResponse"
+            $ref: "#/definitions/Error"
+            
+  /books/{id}:
+    x-swagger-router-controller: book_controller
+    get:
+      description: Get book by id
+      operationId: getBook
+      parameters:
+        - name: id
+          in: path
+          type: string
+          description: Book id
+          required: true
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Book"
+        default:
+          description: Error
+          schema: 
+            $ref: "#/definitions/Error"
+  
+  /wishlist:
+    x-swagger-router-controller: wish_list_controller
+    get:
+      description: Get user wishlist
+      operationId: getWishList
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/WishList"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    
+  /wishlist/{id}:
+    parameters:
+      - name: id
+        in: path
+        type: string
+        description: Book id
+        required: true
+    put:
+      description: Add book to user wishlist
+      operationId: addBookToWishList
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Book"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      description: Delete book from wishlist
+      operationId: deleteBookFromWishList
+      responses:
+        "204":
+          description: Success
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+      
   /swagger:
     x-swagger-pipe: swagger_raw
+  
 # complex objects have schema definitions
 definitions:
-  HelloWorldResponse:
+  BookList:
     required:
-      - message
+      - limit
+      - offset
+      - count
+      - books
     properties:
-      message:
+      limit:
+        type: integer
+        format: int32
+        example: 42
+      offset:
+        type: integer
+        format: int32
+        example: 0
+      count:
+        type: integer
+        format: int32
+        example: 314
+      books:
+        type: array
+        items:
+          $ref: "#/definitions/Book"
+  Book:
+    required:
+      - belmarcId
+      - fields
+      - funds
+      - libraryId
+      - id
+    properties:
+      belmarcId:
         type: string
-  ErrorResponse:
+        description: Official book id
+      fields:
+        type: array
+        description: book description, e.g. book title, authors and etc.
+        items:
+          properties:
+            tag:
+              type: string
+              description: attribute of book description, e.g. title
+            value:
+              type: string
+              description: value which correspond to attribute
+      funds:
+        type: array
+        items:
+          properties:
+            count:
+              type: integer
+              format: int64
+              description: number of books at library affiliate
+            value:
+              type: string
+              description: library affiliate
+      libraryId:
+        type: integer
+        format: int64
+        description: id of book at AlisWEB system
+      id:
+        type: string
+        description: id of book, in our system
+  WishList:
+    required:
+      - id
+      - books
+    properties:
+      id:
+        type: string
+        description: Database wish list id
+      books:
+        type: array
+        description: Array of books in wishlist
+        items:
+          $ref: "#/definitions/Book"
+  Error:
     required:
       - message
     properties:
